@@ -1,0 +1,25 @@
+version: "3"
+services:
+  windows:
+    image: dockurr/windows
+    container_name: msconvert2
+    entrypoint: sh -c "cp /storage/shared/custom.iso /storage/custom.iso && ls -alh /storage && /usr/bin/tini -s /run/entry.sh"
+    volumes:
+      - /home/alexanghh/development/ms_converter/storage/shared/:/storage/shared/
+      - /home/alexanghh/development/ms_converter/storage/SW_DVD5_Office_Professional_Plus_2010w_SP1_64Bit_English_CORE_MLF_X17-76756.ISO:/storage/shared/office.iso
+      - /home/alexanghh/development/ms_converter/storage/shared/win11x64.xml:/run/assets/win11x64.xml
+      - /home/alexanghh/development/ms_converter/tiny11 core x64 beta 1.iso:/storage/shared/custom.iso
+#      - /home/alexanghh/development/ms_converter/win11x64.xml:/storage/windows.boot
+    ports:
+      - 8006:8006
+      - 5000:5000
+    environment:
+      MANUAL: "N"
+      DISK_SIZE: "20G"
+      ARGUMENTS: "-drive id=cdrom3,media=cdrom,if=none,format=raw,readonly=on,file=/storage/shared/office.iso,index=9 -device ide-cd,drive=cdrom3,bus=ide.3,unit=0"  # assumes disk is mounted on D:, driver mounted on E: during installation
+    devices:
+      - /dev/kvm
+    cap_add :
+      - NET_ADMIN
+    stop_grace_period: "120s"
+    restart: on-failure
