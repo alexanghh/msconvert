@@ -13,11 +13,11 @@ While (!(Test-Path C:\Users\Docker\AppData\Local\Programs\Python\Python312\Scrip
 C:\Users\Docker\AppData\Local\Programs\Python\Python312\Scripts\pip.exe install (get-item \\host.lan\Data\python_packages\*.whl)
 echo "Install python packages completed"
 
-echo "Run flask to reg python on network..."
-Start-Process 'C:\Users\Docker\AppData\Local\Programs\Python\Python312\python.exe' -WorkingDirectory '\\host.lan\Data\msconvert\' -ArgumentList '-m', 'flask', 'run', '--host', '0.0.0.0'
+echo "Run fastapi to reg python on network..."
+Start-Process 'C:\Users\Docker\AppData\Local\Programs\Python\Python312\python.exe' -WorkingDirectory '\\host.lan\Data\msconvert\' -ArgumentList '-m', 'uvicorn', 'main:app', '--host', '0.0.0.0'
 Start-Sleep -Seconds 5
 taskkill /f /im python.exe
-echo "Run flask completed"
+echo "Run fastapi completed"
 
  echo "Setting python networking..."
 $rules = Get-NetFirewallRule -All |? {$_.DisplayName -match "python.exe"}
