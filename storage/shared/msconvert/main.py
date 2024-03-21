@@ -13,9 +13,6 @@ app = FastAPI(
     version="0.0.1",
 )
 
-@app.get("/")
-async def hello_world():
-    return {"Hello": "World"}
 
 @app.post("/convert/",
           tags=["Conversion"],
@@ -108,3 +105,10 @@ async def cache_delete_file(filename):
     cached_file.seek(0)
     os.remove(os.path.abspath(filename))
     return cached_file
+
+
+@app.get("/health", tags=["Health"])
+@app.get("/healthz", tags=["Health"])
+def get_health():
+    return {"status": "alive"}
+
