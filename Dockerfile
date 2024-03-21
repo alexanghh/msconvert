@@ -1,9 +1,9 @@
 FROM dockurr/windows:2.04
 
-COPY ./win11x64.xml /run/assets/
-#COPY ./iso/tiny11_core_x64_beta_1.iso /storage/custom.iso
-#COPY ./iso/SW_DVD5_Office_Professional_Plus_2010w_SP1_64Bit_English_CORE_MLF_X17-76756.ISO /storage/office.iso
-COPY ./storage/shared /storage/shared/
+COPY ["./win11x64.xml", "/run/assets/"]
+COPY ["./iso/tiny11 core x64 beta 1.iso", "/storage/custom.iso"]
+COPY ["./iso/SW_DVD5_Office_Professional_Plus_2010w_SP1_64Bit_English_CORE_MLF_X17-76756.ISO", "/storage/office.iso"]
+COPY ["./storage/shared", "/storage/shared/"]
 
 ENV MANUAL: "N"
 ENV CPU_CORES "2"
