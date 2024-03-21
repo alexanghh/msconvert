@@ -6,21 +6,37 @@ import uuid
 from fastapi import FastAPI, File, UploadFile, HTTPException
 from fastapi.responses import StreamingResponse
 
-app = FastAPI()
-
+app = FastAPI(
+    title="MSConvert",
+    description="Converts Microsoft Office file to PDF file using **Microsoft Office software**. Supported file formats include **doc, docx, ppt, pptx, xls, xlsx**.",
+    summary="Microsoft Office to PDF File Converter.",
+    version="0.0.1",
+)
 
 @app.get("/")
 async def hello_world():
     return {"Hello": "World"}
 
-
-@app.post("/convert/", response_class=StreamingResponse)
-async def convert(infile: UploadFile = File(...)):
-    filename = f'{uuid.uuid4()}{infile.filename}'
+@app.post("/convert/",
+          tags=["Conversion"],
+          response_class=StreamingResponse,
+          responses={
+              200: {
+                  "content": {"application/pdf": {
+                      "example": "(no example available)"
+                  }},
+                  "description": "Return the PDF file.",
+              }
+          },)
+async def convert(office_file: UploadFile = File(...)):
+    """
+    Converts Microsoft Office file to PDF file
+    """
+    filename = f'{uuid.uuid4()}{office_file.filename}'
     async with aiof.open(filename, "wb") as out:
-        await out.write(await infile.read())
+        await out.write(await office_file.read())
         await out.flush()
-    _, extension = os.path.splitext(infile.filename)
+    _, extension = os.path.splitext(office_file.filename)
     try:
         data = None
         match extension:
@@ -37,7 +53,7 @@ async def convert(infile: UploadFile = File(...)):
                                      media_type='application/pdf',
                                      headers={
                                          'Content-Disposition': 'attachment; filename="{}"'.format(
-                                             infile.filename + ".pdf")})
+                                             office_file.filename + ".pdf")})
     finally:
         os.remove(filename)
     raise HTTPException(status_code=400, detail="File not converted")
