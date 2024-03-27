@@ -1,17 +1,55 @@
 import aiofiles as aiof
 import comtypes.client
+from dotenv import load_dotenv
 import io
 import os
 import uuid
 from fastapi import FastAPI, File, UploadFile, HTTPException
+from fastapi.openapi.docs import (
+    get_redoc_html,
+    get_swagger_ui_html,
+    get_swagger_ui_oauth2_redirect_html,
+)
+from fastapi.staticfiles import StaticFiles
 from fastapi.responses import StreamingResponse
+import uvicorn
 
 app = FastAPI(
     title="MSConvert",
     description="Converts Microsoft Office file to PDF file using **Microsoft Office software**. Supported file formats include **doc, docx, ppt, pptx, xls, xlsx**.",
     summary="Microsoft Office to PDF File Converter.",
     version="0.0.1",
+    docs_url=None, # disable to allow overriding of cdn
+    redoc_url=None, # disable
 )
+
+app.mount("/static", StaticFiles(directory="static"), name="static")
+
+
+@app.get("/", include_in_schema=False)
+@app.get("/docs", include_in_schema=False)
+async def custom_swagger_ui_html():
+    return get_swagger_ui_html(
+        openapi_url=app.openapi_url,
+        title=app.title + " - Swagger UI",
+        oauth2_redirect_url=app.swagger_ui_oauth2_redirect_url,
+        swagger_js_url="/static/swagger-ui-bundle.js",
+        swagger_css_url="/static/swagger-ui.css",
+    )
+
+
+@app.get(app.swagger_ui_oauth2_redirect_url, include_in_schema=False)
+async def swagger_ui_redirect():
+    return get_swagger_ui_oauth2_redirect_html()
+
+
+@app.get("/redoc", include_in_schema=False)
+async def redoc_html():
+    return get_redoc_html(
+        openapi_url=app.openapi_url,
+        title=app.title + " - ReDoc",
+        redoc_js_url="/static/redoc.standalone.js",
+    )
 
 
 @app.post("/convert/",
@@ -110,5 +148,8 @@ async def cache_delete_file(filename):
 @app.get("/health", tags=["Health"])
 @app.get("/healthz", tags=["Health"])
 def get_health():
-    return {"status": "alive"}
+    return "OK"
 
+
+if __name__ == "__main__":
+    uvicorn.run("main:app", host="0.0.0.0", port=5000, log_level="info")
